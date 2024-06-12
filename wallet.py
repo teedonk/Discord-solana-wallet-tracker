@@ -12,3 +12,11 @@ def load_wallets() -> Dict[str, str]:
     except FileNotFoundError:
         wallets = {}
     return wallets
+
+# Function to save wallets from memory to the file
+def save_wallets(wallets: Dict[str, str]) -> None:
+    with open(WALLETS_FILE, "w") as file:
+        for wallet_address in wallets:
+            file.write(wallet_address + "\n")
+
+wallets = load_wallets()
