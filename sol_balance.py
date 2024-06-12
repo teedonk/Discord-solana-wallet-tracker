@@ -71,3 +71,41 @@ def get_solana_balance(wallet_address):
     except requests.exceptions.RequestException as e:
         print("Error:", e)
         return None
+
+def get_transaction_info(transaction_signature: str) -> Dict:
+    # URL of the Solana RPC endpoint
+    rpc_url = 'https://api.mainnet-beta.solana.com'
+
+    # Construct the JSON-RPC request payload
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getConfirmedTransaction",
+        "params": [transaction_signature]
+    }
+
+    try:
+        # Send the request to the Solana RPC endpoint
+        response = requests.post(rpc_url, json=payload)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+
+        # Parse the JSON response
+        data = response.json()
+
+        # Extract relevant transaction information
+        amount = data['result']['meta']['postBalances'][0] - data['result']['meta']['preBalances'][0]
+        sender = data['result']['transaction']['message']['accountKeys'][0]
+        receiver = data['result']['transaction']['message']['accountKeys'][1]
+        contract = data['result']['transaction']['message']['accountKeys'][2]
+
+        transaction_info = {
+            "Amount": amount,
+            "Sender": sender,
+            "Receiver": receiver,
+            "Contract": contract
+        }
+
+        return transaction_info
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+        return None
