@@ -54,3 +54,20 @@ def wallet_list() -> str:
     else:
         return 'No wallets saved.'
 
+
+TRACKED_WALLETS_FILE = "tracked_wallets.txt"
+
+def load_tracked_wallets() -> Dict[str, str]:
+    try:
+        with open(TRACKED_WALLETS_FILE, "r") as file:
+            tracked_wallets = {line.strip(): line.strip() for line in file}
+    except FileNotFoundError:
+        tracked_wallets = {}
+    return tracked_wallets
+
+def save_tracked_wallets(tracked_wallets: Dict[str, str]) -> None:
+    with open(TRACKED_WALLETS_FILE, "w") as file:
+        for wallet_address in tracked_wallets:
+            file.write(wallet_address + "\n")
+
+tracked_wallets = load_tracked_wallets()
