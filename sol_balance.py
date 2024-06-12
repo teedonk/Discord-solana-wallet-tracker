@@ -109,3 +109,27 @@ def get_transaction_info(transaction_signature: str) -> Dict:
     except requests.exceptions.RequestException as e:
         print("Error:", e)
         return None
+
+
+async def send_transaction_updates(transaction_info: Dict, client) -> None:
+    try:
+        print("Transaction info received:", transaction_info)  # Debugging statement
+
+        # Extract the contract address from the transaction info
+        contract_address = transaction_info['Contract']
+
+        # Get token details from Solscan API
+        token_ticker, token_contract_address = get_token_details(contract_address)
+
+        # Construct Solscan link for the transaction
+        transaction_link = f"{SOLSCAN_API_URL}/transaction/{transaction_info['signature']}"
+
+        # Format the transaction information including token details
+        formatted_transaction_info = f"Transaction Info:\nToken: {token_ticker}\nTransaction Link: {transaction_link}\n{json.dumps(transaction_info)}"
+
+        # Send transaction information to a channel or log it
+        channel = client.get_channel(1237353384164724738)
+        await channel.send(formatted_transaction_info)
+
+    except Exception as e:
+        print("Error:", e)
