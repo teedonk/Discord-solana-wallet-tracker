@@ -133,3 +133,47 @@ async def send_transaction_updates(transaction_info: Dict, client) -> None:
 
     except Exception as e:
         print("Error:", e)
+
+
+async def track_transactions(wallet_address: str, client) -> None:
+    if wallet_address not in wallets:
+        wallets[wallet_address] = ''  # Initialize wallet_address if not present
+
+    while True:
+        try:
+            # URL of the Solana RPC endpoint
+            rpc_url = 'https://api.mainnet-beta.solana.com'
+
+            # Construct the JSON-RPC request payload
+            payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "getConfirmedSignaturesForAddress2",
+                "params": [wallet_address, {"limit": 1}]
+            }
+
+            # Send the request to the Solana RPC endpoint
+            response = requests.post(rpc_url, json=payload)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+
+            # Parse the JSON response
+            data = response.json()
+
+            # Extract the most recent transaction signature
+            latest_signature = data['result'][-1]['signature']
+
+            # Check if the transaction signature has changed since the last check
+            if wallets[wallet_address] != latest_signature:
+                # Update the transaction signature for the wallet
+                wallets[wallet_address] = latest_signature
+
+                # Retrieve transaction information
+                transaction_info = get_transaction_info(latest_signature)
+
+                # Send transaction information to a channel or log it
+                await send_transaction_updates(transaction_info, client)
+        except Exception as e:
+            print("Error:", e)
+
+        # Wait for some time before polling again
+        await asyncio.sleep(60)
