@@ -89,3 +89,9 @@ def untrack_wallet(wallet_address: str) -> str:
         return f'Wallet {wallet_address} is no longer being tracked.'
     else:
         return f'Wallet {wallet_address} is not being tracked.'
+
+def tracked_wallets_list() -> str:
+    if tracked_wallets:
+        return f'Wallets being tracked: {", ".join(tracked_wallets.keys())}'
+    else:
+        return 'No wallets being tracked.'
