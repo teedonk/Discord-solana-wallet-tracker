@@ -71,3 +71,21 @@ def save_tracked_wallets(tracked_wallets: Dict[str, str]) -> None:
             file.write(wallet_address + "\n")
 
 tracked_wallets = load_tracked_wallets()
+
+
+def track_wallet(wallet_address: str) -> str:
+    # Add wallet to memory
+    tracked_wallets[wallet_address] = wallet_address
+    # Save tracked wallets to file
+    save_tracked_wallets(tracked_wallets)
+    return f'Wallet {wallet_address} is now being tracked.'
+
+def untrack_wallet(wallet_address: str) -> str:
+    # Check if wallet exists
+    if wallet_address in tracked_wallets:
+        del tracked_wallets[wallet_address]
+        # Save tracked wallets to file
+        save_tracked_wallets(tracked_wallets)
+        return f'Wallet {wallet_address} is no longer being tracked.'
+    else:
+        return f'Wallet {wallet_address} is not being tracked.'
