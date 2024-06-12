@@ -39,3 +39,35 @@ def get_token_details(token_address):
         return None, None
 
 
+def get_solana_balance(wallet_address):
+    # URL of the Solana RPC endpoint
+    rpc_url = 'https://api.mainnet-beta.solana.com'
+
+    # Construct the JSON-RPC request payload
+    payload = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getAccountInfo",
+        "params": [wallet_address]
+    }
+
+    try:
+        # Send the request to the Solana RPC endpoint
+        response = requests.post(rpc_url, json=payload)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+
+        # Parse the JSON response
+        data = response.json()
+
+        # Check if account exists
+        if 'result' not in data:
+            print("Account not found.")
+            return None
+
+        # Extract balance from the response
+        balance = data['result']['value']['lamports'] / 10 ** 9  # Convert lamports to SOL
+
+        return balance
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+        return None
