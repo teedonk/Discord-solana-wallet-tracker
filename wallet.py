@@ -32,3 +32,25 @@ def add_wallet(user_input: str) -> str:
     # Save wallets to file
     save_wallets(wallets)
     return f'Wallet {wallet_address} saved.'
+
+def remove_wallet(user_input: str) -> str:
+    parts = user_input.split()
+    if len(parts) != 2 or parts[0] != '/remove_wallet':
+        return 'Invalid command. Please use /remove_wallet <wallet_address>.'
+
+    wallet_address = parts[1]
+    # Check if wallet exists
+    if wallet_address in wallets:
+        del wallets[wallet_address]
+        # Save wallets to file
+        save_wallets(wallets)
+        return f'Wallet {wallet_address} deleted.'
+    else:
+        return f'Wallet {wallet_address} not found.'
+
+def wallet_list() -> str:
+    if wallets:
+        return f'Wallets saved: {", ".join(wallets.keys())}'
+    else:
+        return 'No wallets saved.'
+
